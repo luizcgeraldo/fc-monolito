@@ -28,7 +28,7 @@ describe("ProductAdmFacade test", () => {
     //   addUseCase: addProductUseCase,
     //   stockUseCase: undefined,
     // });
-
+    // facade sustituiu o código comentado acima
     const productFacade = ProductAdmFacadeFactory.create();
 
     const input = {
