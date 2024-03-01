@@ -1,24 +1,10 @@
-import {
-    Column,
-    DataType,
-    Model,
-    PrimaryKey,
-    Table,
-} from "sequelize-typescript";
+import ProductModel from "./product.model";
+import InvoiceProductModel from "./invoice-product.model";
 
-interface ProductData {
-    id: string;
-    name: string;
-    price: number;
-    createdAt: Date;
-    updatedAt: Date;
-}
+import { Column, BelongsToMany, HasMany, Model, PrimaryKey, Table } from "sequelize-typescript";
 
-@Table({
-    tableName: "invoices",
-    timestamps: false,
-})
-export class InvoiceModel extends Model {
+@Table({ tableName: "invoices", timestamps: false })
+export default class InvoiceModel extends Model {
     @PrimaryKey
     @Column({ allowNull: false })
     id: string;
@@ -30,29 +16,34 @@ export class InvoiceModel extends Model {
     document: string;
 
     @Column({ allowNull: false })
+    address_street: string;
+
+    @Column({ allowNull: false })
+    address_number: string;
+
+    @Column({ allowNull: false })
+    address_complement: string;
+
+    @Column({ allowNull: false })
+    address_city: string;
+
+    @Column({ allowNull: false })
+    address_state: string;
+
+    @Column({ allowNull: false })
+    address_zipCode: string;
+
+    @BelongsToMany(() => ProductModel, {
+        through: { model: () => InvoiceProductModel },
+    })
+    items: ProductModel[];
+
+    @HasMany(() => InvoiceProductModel)
+    invoiceProducts: InvoiceProductModel[];
+
+    @Column({ allowNull: false, field: "created_at" })
     createdAt: Date;
 
-    @Column({ allowNull: false })
+    @Column({ allowNull: false, field: "updated_at" })
     updatedAt: Date;
-
-    @Column({ allowNull: false, type: DataType.JSON })
-    items: ProductData[];
-
-    @Column({ allowNull: false })
-    addressStreet: string;
-
-    @Column({ allowNull: false })
-    addressNumber: string;
-
-    @Column({ allowNull: false })
-    addressComplement: string;
-
-    @Column({ allowNull: false })
-    addressCity: string;
-
-    @Column({ allowNull: false })
-    addressState: string;
-
-    @Column({ allowNull: false })
-    addressZipCode: string;
 }

@@ -1,6 +1,7 @@
-import { Invoice } from "../domain/invoice";
+import Invoice from "../domain/invoice";
 
-export interface InvoiceGateway {
+
+export default interface InvoiceGateway {
+    create(input: Invoice): Promise<Invoice>;
     find(id: string): Promise<Invoice>;
-    add(invoice: Invoice): Promise<Invoice>;
 }

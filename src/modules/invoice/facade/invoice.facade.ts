@@ -1,35 +1,27 @@
-import  UseCaseInterface from "../../@shared/usecase/use-case.interface";
-import {
-    FindInvoiceFacadeInputDto,
-    FindInvoiceFacadeOutputDto,
-    GenerateInvoiceFacadeInputDto,
-    GenerateInvoiceFacadeOutputDto,
-    InvoiceFacadeInterface,
-} from "./invoice.facade.interface";
+import FindInvoiceUseCase from "../usecases/find-invoice/find-invoice.usecase";
+import GenerateInvoiceUseCase from "../usecases/generate-invoice/generate-invoice.usecase";
+import { FindInvoiceFacadeInputDTO, FindInvoiceFacadeOutputDTO, GenerateInvoiceFacadeInputDTO, GenerateInvoiceFacadeOutputDTO } from "./invoice.facade.dto";
+import InvoiceFacadeInterface from "./invoice.facade.interface";
 
 export interface UseCaseProps {
-    generateUseCase: UseCaseInterface;
-    findUseCase: UseCaseInterface;
+    findUseCase: FindInvoiceUseCase,
+    generateUseCase: GenerateInvoiceUseCase,
 }
 
-export class InvoiceFacade implements InvoiceFacadeInterface {
-    private _generateUseCase: UseCaseInterface;
-    private _findUseCase: UseCaseInterface;
+export default class InvoiceFacade implements InvoiceFacadeInterface {
+    private _findUseCase: FindInvoiceUseCase;
+    private _generateUseCase: GenerateInvoiceUseCase;
 
-    constructor(useCasesProps: UseCaseProps) {
-        this._generateUseCase = useCasesProps.generateUseCase;
-        this._findUseCase = useCasesProps.findUseCase;
+    constructor(props: UseCaseProps) {
+        this._findUseCase = props.findUseCase;
+        this._generateUseCase = props.generateUseCase;
     }
 
-    async generateInvoice(
-        input: GenerateInvoiceFacadeInputDto
-    ): Promise<GenerateInvoiceFacadeOutputDto> {
-        return await this._generateUseCase.execute(input);
-    }
-
-    async findInvoice(
-        input: FindInvoiceFacadeInputDto
-    ): Promise<FindInvoiceFacadeOutputDto> {
+    async find(input: FindInvoiceFacadeInputDTO): Promise<FindInvoiceFacadeOutputDTO> {
         return await this._findUseCase.execute(input);
+    }
+
+    async generate(input: GenerateInvoiceFacadeInputDTO): Promise<GenerateInvoiceFacadeOutputDTO> {
+        return await this._generateUseCase.execute(input);
     }
 }

@@ -23,7 +23,7 @@ export default class ClientAdmFacade implements ClientAdmFacadeInterface {
     await this._addUsecase.execute(input);
   }
   async find(
-    input: FindClientFacadeInputDto
+      input: FindClientFacadeInputDto
   ): Promise<FindClientFacadeOutputDto> {
     return await this._findUsecase.execute(input);
   }

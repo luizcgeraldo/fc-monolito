@@ -1,54 +1,38 @@
-import  Id  from "../../../@shared/domain/value-object/id.value-object";
-import  UseCaseInterface  from "../../../@shared/usecase/use-case.interface";
+import Invoice from "../../domain/invoice";
+import Product from "../../domain/product";
+import Id from "../../../@shared/domain/value-object/id.value-object";
+import InvoiceGateway from "../../gateway/invoice.gateway";
+import { GenerateInvoiceUseCaseInputDTO, GenerateInvoiceUseCaseOutputDTO } from "./generate-invoice.dto";
 import { Address } from "../../domain/address.value-object";
-import { Invoice } from "../../domain/invoice";
-import { Product } from "../../domain/product";
-import { InvoiceGateway } from "../../gateway/invoice.gateway";
-import {
-    GenerateInvoiceUseCaseInputDto,
-    GenerateInvoiceUseCaseOutputDto,
-} from "./generate-invoice.dto";
 
-export class GenerateInvoiceUseCase implements UseCaseInterface {
-    constructor(private invoiceRepository: InvoiceGateway) {}
+export default class GenerateInvoiceUseCase {
+    private _invoiceRepository: InvoiceGateway;
 
-    async execute(
-        input: GenerateInvoiceUseCaseInputDto
-    ): Promise<GenerateInvoiceUseCaseOutputDto> {
-        const {
-            name,
-            document,
-            street,
-            number,
-            complement,
-            city,
-            state,
-            zipCode,
-            items,
-        } = input;
+    constructor(invoiceRepository: InvoiceGateway) {
+        this._invoiceRepository = invoiceRepository;
+    }
 
-        const invoice = new Invoice({
-            name,
-            document,
+    async execute(input: GenerateInvoiceUseCaseInputDTO): Promise<GenerateInvoiceUseCaseOutputDTO> {
+        const props = {
+            name: input.name,
+            document: input.document,
             address: new Address({
-                street,
-                number,
-                complement,
-                city,
-                state,
-                zipCode,
+                street: input.street,
+                number: input.number,
+                complement: input.complement,
+                city: input.city,
+                state: input.state,
+                zipCode: input.zipCode,
             }),
-            items: items.map(
-                (item) =>
-                    new Product({
-                        id: new Id(item.id),
-                        name: item.name,
-                        price: item.price,
-                    })
-            ),
-        });
+            items: input.items.map((item) => new Product({
+                id: new Id(item.id),
+                name: item.name,
+                price: item.price,
+            }))
+        }
 
-        await this.invoiceRepository.add(invoice);
+        const invoice = new Invoice(props);
+        await this._invoiceRepository.create(invoice);
 
         return {
             id: invoice.id.id,
@@ -60,12 +44,14 @@ export class GenerateInvoiceUseCase implements UseCaseInterface {
             city: invoice.address.city,
             state: invoice.address.state,
             zipCode: invoice.address.zipCode,
-            items: invoice.items.map((product) => ({
-                id: product.id.id,
-                name: product.name,
-                price: product.price,
+            items: invoice.items.map((item) => ({
+                id: item.id.id,
+                name: item.name,
+                price: item.price,
             })),
-            total: invoice.total,
+            total: invoice.items.reduce((accumulator, value) => {
+                return accumulator + value.price;
+            }, 0)
         };
     }
 }
